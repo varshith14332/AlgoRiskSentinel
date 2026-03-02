@@ -161,10 +161,9 @@ export default function App() {
           {/* Page content */}
           <main className="flex-1 overflow-y-auto p-6 bg-sentinel-900">
             <Routes>
-              {/* Role-gated routes */}
               <Route path="/" element={
                 ['supplier', 'distributor', 'analyst'].includes(role)
-                  ? <Dashboard />
+                  ? <Dashboard role={role} />
                   : <Navigate to={ROLE_DEFAULT[role] || '/verify'} replace />
               } />
               <Route path="/shipments" element={

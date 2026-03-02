@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-
 @theme {
   --color-sentinel-900: #0a0e1a;
   --color-sentinel-800: #111827;
@@ -23,12 +21,15 @@
     @apply bg-sentinel-900 text-white font-sans antialiased;
     margin: 0;
   }
+
   ::-webkit-scrollbar {
     width: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: var(--color-sentinel-800);
   }
+
   ::-webkit-scrollbar-thumb {
     background: var(--color-sentinel-600);
     border-radius: 3px;

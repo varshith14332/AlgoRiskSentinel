@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import AlertsTable from '../components/AlertsTable';
 import { getAlerts, submitPayment } from '../services/api';
-import { DEMO_ALERTS } from '../data/demo';
 import type { Alert } from '../types';
 
 interface AlertsProps {
@@ -35,7 +34,7 @@ function playAlertSound() {
     }
 }
 
-export default function Alerts({ walletAddress, role }: AlertsProps) {
+export default function Alerts({ walletAddress }: AlertsProps) {
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [filter, setFilter] = useState('All');
     const [paymentModal, setPaymentModal] = useState<string | null>(null);
@@ -62,8 +61,8 @@ export default function Alerts({ walletAddress, role }: AlertsProps) {
             prevAlertCountRef.current = highAlerts.length;
             setAlerts(data);
         } catch {
-            setAlerts(DEMO_ALERTS);
-            prevAlertCountRef.current = DEMO_ALERTS.filter(a => a.severity === 'High').length;
+            setAlerts([]);
+            prevAlertCountRef.current = 0;
         } finally {
             setLoading(false);
         }

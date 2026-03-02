@@ -1,15 +1,26 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import AlertsTable from '../components/AlertsTable';
 import { getDashboardStats, getAlerts } from '../services/api';
-import { DEMO_STATS, DEMO_ALERTS } from '../data/demo';
 import type { DashboardStats, Alert } from '../types';
 
-export default function Dashboard() {
-    const [stats, setStats] = useState<DashboardStats>(DEMO_STATS);
-    const [alerts, setAlerts] = useState<Alert[]>(DEMO_ALERTS);
+interface DashboardProps {
+    role: string;
+}
+
+export default function Dashboard({ role }: DashboardProps) {
+    const navigate = useNavigate();
+    const [stats, setStats] = useState<DashboardStats>({
+        totalShipments: 0,
+        delayedShipments: 0,
+        highRiskShipments: 0,
+        averageRiskScore: 0,
+        alertsByType: {},
+        recentAlerts: []
+    });
+    const [alerts, setAlerts] = useState<Alert[]>([]);
     const [loading, setLoading] = useState(true);
-    const [dataSource, setDataSource] = useState<'live' | 'demo'>('demo');
 
     useEffect(() => {
         async function fetchData() {
@@ -20,11 +31,16 @@ export default function Dashboard() {
                 ]);
                 setStats(statsData);
                 setAlerts(alertsData.slice(0, 10));
-                setDataSource('live');
             } catch {
-                setStats(DEMO_STATS);
-                setAlerts(DEMO_ALERTS);
-                setDataSource('demo');
+                setStats({
+                    totalShipments: 0,
+                    delayedShipments: 0,
+                    highRiskShipments: 0,
+                    averageRiskScore: 0,
+                    alertsByType: {},
+                    recentAlerts: []
+                });
+                setAlerts([]);
             } finally {
                 setLoading(false);
             }
@@ -43,12 +59,16 @@ export default function Dashboard() {
                     <h1 className="text-2xl font-bold text-white">Dashboard</h1>
                     <p className="text-sm text-sentinel-400 mt-1">Real-time supply chain risk intelligence</p>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full ${dataSource === 'live'
-                        ? 'bg-risk-low/20 text-risk-low'
-                        : 'bg-risk-medium/20 text-risk-medium'
-                    }`}>
-                    {dataSource === 'live' ? '● Live Data' : '● Demo Data'}
-                </span>
+                <div className="flex items-center gap-4">
+                    {(role === 'supplier' || role === 'distributor') && (
+                        <button
+                            onClick={() => navigate('/shipments?create=true')}
+                            className="text-sm bg-gradient-to-r from-accent to-algo-teal text-sentinel-900 font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition"
+                        >
+                            + Create Shipment
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Stats Grid */}

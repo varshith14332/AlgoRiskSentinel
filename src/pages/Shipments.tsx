@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getShipments, createShipment, analyzeShipment } from '../services/api';
-import { DEMO_SHIPMENTS } from '../data/demo';
 import type { Shipment } from '../types';
 
 interface ShipmentsProps {
@@ -47,18 +47,27 @@ export default function Shipments({ role }: ShipmentsProps) {
         trafficLevel: 'Medium',
     });
 
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const fetchShipments = useCallback(async () => {
         try {
             const data = await getShipments();
             setShipments(data);
         } catch {
-            setShipments(DEMO_SHIPMENTS);
+            setShipments([]);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    useEffect(() => { fetchShipments(); }, [fetchShipments]);
+    useEffect(() => {
+        fetchShipments();
+        if (searchParams.get('create') === 'true' && (role === 'supplier' || role === 'analyst' || role === 'distributor')) {
+            setShowForm(true);
+            // Remove the query param so it doesn't re-open on refresh
+            setSearchParams({});
+        }
+    }, [fetchShipments, searchParams, role, setSearchParams]);
 
     const handleCreate = async () => {
         const originCoords = CITY_COORDS[form.origin] || { lat: 20.5, lng: 78.9 };
@@ -126,7 +135,7 @@ export default function Shipments({ role }: ShipmentsProps) {
                     <button onClick={fetchShipments} className="text-sm bg-sentinel-700 text-sentinel-400 px-3 py-2 rounded-lg hover:text-white transition">
                         ↻ Refresh
                     </button>
-                    {(role === 'supplier' || role === 'analyst') && (
+                    {(role === 'supplier' || role === 'analyst' || role === 'distributor') && (
                         <button
                             onClick={() => setShowForm(true)}
                             className="text-sm bg-gradient-to-r from-accent to-algo-teal text-sentinel-900 font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition"
@@ -148,9 +157,9 @@ export default function Shipments({ role }: ShipmentsProps) {
                             <div className="flex items-center justify-between mb-3">
                                 <span className="font-mono text-accent text-sm font-medium">{s.shipmentID}</span>
                                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.status === 'Delivered' ? 'bg-risk-low/20 text-risk-low' :
-                                        s.status === 'Delayed' ? 'bg-risk-medium/20 text-risk-medium' :
-                                            s.status === 'At Risk' ? 'bg-risk-high/20 text-risk-high' :
-                                                'bg-accent/20 text-accent'
+                                    s.status === 'Delayed' ? 'bg-risk-medium/20 text-risk-medium' :
+                                        s.status === 'At Risk' ? 'bg-risk-high/20 text-risk-high' :
+                                            'bg-accent/20 text-accent'
                                     }`}>
                                     {s.status}
                                 </span>

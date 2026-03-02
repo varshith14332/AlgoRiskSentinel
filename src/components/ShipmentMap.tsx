@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, Polyline, CircleMarker, Popup, useMap } from 'react-leaflet';
 import type { Shipment, Alert } from '../types';
-import { useEffect } from 'react';
+import { useEffect, Fragment } from 'react';
 
 interface ShipmentMapProps {
     shipments: Shipment[];
@@ -50,7 +50,7 @@ export default function ShipmentMap({ shipments, alerts, selectedShipment }: Shi
                 const color = riskColor(score);
 
                 return (
-                    <div key={shipment.shipmentID}>
+                    <Fragment key={shipment.shipmentID}>
                         {/* Planned route */}
                         {shipment.routeCoordinates && shipment.routeCoordinates.length > 0 && (
                             <Polyline
@@ -109,7 +109,7 @@ export default function ShipmentMap({ shipments, alerts, selectedShipment }: Shi
                                 </div>
                             </Popup>
                         </CircleMarker>
-                    </div>
+                    </Fragment>
                 );
             })}
         </MapContainer>

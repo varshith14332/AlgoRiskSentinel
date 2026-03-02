@@ -1,5 +1,4 @@
 import { RiskDistributionChart, AlertTypesChart, DelayTrendsChart, CarrierPerformanceChart } from '../components/RiskCharts';
-import { DEMO_RISK_DISTRIBUTION, DEMO_ALERT_TYPES, DEMO_DELAY_TRENDS, DEMO_CARRIER_PERFORMANCE } from '../data/demo';
 
 export default function Analytics() {
     return (
@@ -10,10 +9,10 @@ export default function Analytics() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RiskDistributionChart data={DEMO_RISK_DISTRIBUTION} />
-                <AlertTypesChart data={DEMO_ALERT_TYPES} />
-                <DelayTrendsChart data={DEMO_DELAY_TRENDS} />
-                <CarrierPerformanceChart data={DEMO_CARRIER_PERFORMANCE} />
+                <RiskDistributionChart data={[]} />
+                <AlertTypesChart data={[]} />
+                <DelayTrendsChart data={[]} />
+                <CarrierPerformanceChart data={[]} />
             </div>
 
             {/* AI Insights Panel */}

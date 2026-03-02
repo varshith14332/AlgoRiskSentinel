@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import ShipmentMap from '../components/ShipmentMap';
 import { getShipments, getAlerts } from '../services/api';
-import { DEMO_SHIPMENTS, DEMO_ALERTS } from '../data/demo';
 import type { Shipment, Alert } from '../types';
 
 export default function MapView() {
-    const [shipments, setShipments] = useState<Shipment[]>(DEMO_SHIPMENTS);
-    const [alerts, setAlerts] = useState<Alert[]>(DEMO_ALERTS);
+    const [shipments, setShipments] = useState<Shipment[]>([]);
+    const [alerts, setAlerts] = useState<Alert[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
     useEffect(() => {
         Promise.all([getShipments(), getAlerts()])
             .then(([s, a]) => { setShipments(s); setAlerts(a); })
-            .catch(() => { setShipments(DEMO_SHIPMENTS); setAlerts(DEMO_ALERTS); });
+            .catch(() => { setShipments([]); setAlerts([]); });
     }, []);
 
     const selectedShipment = selectedId ? shipments.find(s => s.shipmentID === selectedId) || null : null;
@@ -49,8 +48,8 @@ export default function MapView() {
                                 <div className="flex items-center justify-between mb-1">
                                     <span className="font-mono text-accent font-medium">{s.shipmentID}</span>
                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${s.status === 'Delivered' ? 'bg-risk-low/20 text-risk-low' :
-                                            s.status === 'Delayed' ? 'bg-risk-medium/20 text-risk-medium' :
-                                                'bg-risk-high/20 text-risk-high'
+                                        s.status === 'Delayed' ? 'bg-risk-medium/20 text-risk-medium' :
+                                            'bg-risk-high/20 text-risk-high'
                                         }`}>{s.status}</span>
                                 </div>
                                 <p className="text-sentinel-400">{s.origin} → {s.destination}</p>
