@@ -2,36 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import AlertsTable from '../components/AlertsTable';
 import { getAlerts, submitPayment } from '../services/api';
 import type { Alert } from '../types';
+import { playAlertSound } from '../utils/audio';
 
 interface AlertsProps {
     walletAddress: string | null;
     role: string;
-}
-
-// Audio alert using Web Audio API (no external files needed)
-function playAlertSound() {
-    try {
-        const ctx = new AudioContext();
-        // Create an alarm-like tone
-        const oscillator = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        oscillator.connect(gain);
-        gain.connect(ctx.destination);
-
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(880, ctx.currentTime); // A5
-        oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.15); // E5
-        oscillator.frequency.setValueAtTime(880, ctx.currentTime + 0.3); // A5
-
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.5);
-    } catch {
-        // Audio not available
-    }
 }
 
 export default function Alerts({ walletAddress }: AlertsProps) {
@@ -135,7 +110,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                 <div className="fixed top-0 left-0 right-0 z-50 animate-pulse">
                     <div className="bg-gradient-to-r from-risk-high to-red-700 text-white px-6 py-4 flex items-center justify-between shadow-2xl">
                         <div className="flex items-center gap-4">
-                            <span className="text-3xl animate-bounce">🚨</span>
+                            <span className="text-3xl animate-bounce">ALERT</span>
                             <div>
                                 <p className="font-bold text-lg">ANOMALY DETECTED — {alertBanner.riskType.toUpperCase()}</p>
                                 <p className="text-sm opacity-90">
@@ -159,7 +134,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                     <button onClick={testAlertSound}
                         className="text-xs bg-risk-high/10 text-risk-high px-3 py-1.5 rounded-lg hover:bg-risk-high/20 transition border border-risk-high/20"
                         title="Test alert sound">
-                        🔔 Test Alert
+                        Test Alert
                     </button>
                     {['All', 'High', 'Medium', 'Low'].map(s => (
                         <button
@@ -197,7 +172,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                         {paymentStatus === 'success' && accessKey ? (
                             <>
                                 <div className="text-center mb-4">
-                                    <span className="text-4xl">🔓</span>
+                                    <span className="text-4xl">(Access)</span>
                                     <h3 className="text-lg font-bold text-risk-low mt-2">Access Granted!</h3>
                                     <p className="text-sm text-sentinel-400 mt-1">Payment verified on Algorand blockchain</p>
                                 </div>
@@ -217,7 +192,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                         ) : (
                             <>
                                 <div className="flex items-center gap-3 mb-4">
-                                    <span className="text-2xl">💰</span>
+                                    <span className="text-2xl">(Payment)</span>
                                     <div>
                                         <h3 className="text-lg font-bold text-white">HTTP 402 — Payment Required</h3>
                                         <p className="text-xs text-sentinel-400">Premium risk intelligence access</p>
@@ -225,7 +200,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                                 </div>
 
                                 <div className="bg-risk-medium/10 border border-risk-medium/20 rounded-lg p-3 mb-4 text-xs text-risk-medium">
-                                    ⚠️ Status 402: Micropayment required to access premium risk data for <span className="font-mono font-bold">{paymentModal}</span>
+                                    Status 402: Micropayment required to access premium risk data for <span className="font-mono font-bold">{paymentModal}</span>
                                 </div>
 
                                 <div className="bg-sentinel-900 rounded-lg p-3 mb-4 text-xs space-y-2">
@@ -261,7 +236,7 @@ export default function Alerts({ walletAddress }: AlertsProps) {
                                         </p>
                                         {paymentStatus === 'error' && (
                                             <div className="bg-risk-high/10 border border-risk-high/20 rounded-lg p-2 mb-3 text-xs text-risk-high text-center">
-                                                ❌ Transaction verification failed. Please check your tx hash.
+                                                Transaction verification failed. Please check your tx hash.
                                             </div>
                                         )}
                                         <div className="flex gap-3">

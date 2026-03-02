@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const axios = require('axios');
-const Alert = require('../models/Alert');
+const Alert = require('../src/models/Alert').default || require('../src/models/Alert');
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 

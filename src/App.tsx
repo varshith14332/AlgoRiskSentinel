@@ -10,12 +10,12 @@ import { connectWallet, disconnectWallet, reconnectSession } from './services/wa
 
 // Role-based navigation config
 const ALL_NAV_ITEMS = [
-  { path: '/', label: 'Dashboard', icon: '📊', roles: ['supplier', 'distributor', 'analyst'] },
-  { path: '/shipments', label: 'Shipments', icon: '📦', roles: ['supplier', 'distributor', 'analyst'] },
-  { path: '/alerts', label: 'Alerts', icon: '🚨', roles: ['distributor', 'analyst'] },
-  { path: '/analytics', label: 'Analytics', icon: '📈', roles: ['analyst'] },
-  { path: '/map', label: 'Map', icon: '🗺️', roles: ['supplier', 'distributor', 'analyst'] },
-  { path: '/verify', label: 'Verify', icon: '🔍', roles: ['supplier', 'distributor', 'analyst', 'public'] },
+  { path: '/', label: 'Dashboard', icon: '', roles: ['supplier', 'distributor', 'analyst'] },
+  { path: '/shipments', label: 'Shipments', icon: '', roles: ['supplier', 'distributor', 'analyst'] },
+  { path: '/alerts', label: 'Alerts', icon: '', roles: ['distributor', 'analyst'] },
+  { path: '/analytics', label: 'Analytics', icon: '', roles: ['analyst'] },
+  { path: '/map', label: 'Map', icon: '', roles: ['supplier', 'distributor', 'analyst'] },
+  { path: '/verify', label: 'Verify', icon: '', roles: ['supplier', 'distributor', 'analyst', 'public'] },
 ];
 
 // Default landing per role
@@ -105,10 +105,10 @@ export default function App() {
               </select>
               {/* Role description */}
               <p className="text-[10px] text-sentinel-500 mt-1.5">
-                {role === 'supplier' && '📦 Create & track shipments'}
-                {role === 'distributor' && '🚛 Monitor shipments & view alerts'}
-                {role === 'analyst' && '📊 Full access + premium analytics'}
-                {role === 'public' && '🔍 Verify alerts on blockchain'}
+                {role === 'supplier' && 'Create & track shipments'}
+                {role === 'distributor' && 'Monitor shipments & view alerts'}
+                {role === 'analyst' && 'Full access + premium analytics'}
+                {role === 'public' && 'Verify alerts on blockchain'}
               </p>
             </div>
           )}

@@ -58,7 +58,7 @@ def detect_anomaly(shipment_data) -> dict:
         "riskType": "Anomaly",
         "confidence": round(min(0.95, 0.5 + anomaly_score), 2),
         "details": {
-            "isAnomaly": prediction == -1,
+            "isAnomaly": bool(prediction == -1),
             "rawAnomalyScore": round(float(anomaly_score), 4),
         },
     }

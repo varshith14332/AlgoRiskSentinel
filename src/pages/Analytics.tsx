@@ -17,7 +17,7 @@ export default function Analytics() {
 
             {/* AI Insights Panel */}
             <div className="bg-sentinel-800 border border-sentinel-700 rounded-xl p-5">
-                <h3 className="text-sm font-medium text-white mb-4">🤖 AI Insights</h3>
+                <h3 className="text-sm font-medium text-white mb-4">AI Insights</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-sentinel-900/50 rounded-lg p-4 border border-sentinel-700">
                         <p className="text-xs text-sentinel-400 mb-2">Prediction</p>

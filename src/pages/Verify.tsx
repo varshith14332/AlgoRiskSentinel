@@ -70,7 +70,7 @@ export default function Verify() {
     return (
         <div className="max-w-2xl mx-auto space-y-6 pt-8">
             <div className="text-center">
-                <h1 className="text-3xl font-bold text-white mb-2">🔍 Public Verification</h1>
+                <h1 className="text-3xl font-bold text-white mb-2">Public Verification</h1>
                 <p className="text-sentinel-400">Verify risk alerts and blockchain transactions on Algorand</p>
             </div>
 
@@ -79,20 +79,20 @@ export default function Verify() {
                 <button
                     onClick={() => { setMode('shipment'); setCertificate(null); setTxResult(null); setError(''); }}
                     className={`px-5 py-2.5 rounded-lg text-sm font-medium transition ${mode === 'shipment'
-                            ? 'bg-accent text-sentinel-900'
-                            : 'bg-sentinel-800 text-sentinel-400 hover:text-white border border-sentinel-700'
+                        ? 'bg-accent text-sentinel-900'
+                        : 'bg-sentinel-800 text-sentinel-400 hover:text-white border border-sentinel-700'
                         }`}
                 >
-                    📦 Verify by Shipment ID
+                    Verify by Shipment ID
                 </button>
                 <button
                     onClick={() => { setMode('txhash'); setCertificate(null); setTxResult(null); setError(''); }}
                     className={`px-5 py-2.5 rounded-lg text-sm font-medium transition ${mode === 'txhash'
-                            ? 'bg-algo-teal text-sentinel-900'
-                            : 'bg-sentinel-800 text-sentinel-400 hover:text-white border border-sentinel-700'
+                        ? 'bg-algo-teal text-sentinel-900'
+                        : 'bg-sentinel-800 text-sentinel-400 hover:text-white border border-sentinel-700'
                         }`}
                 >
-                    ⛓️ Verify by Tx Hash
+                    Verify by Tx Hash
                 </button>
             </div>
 
@@ -151,7 +151,7 @@ export default function Verify() {
                 <div className="bg-sentinel-800 border border-sentinel-700 rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-algo-teal/10 to-accent/10 p-5 border-b border-sentinel-700">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center text-lg">⛓️</div>
+                            <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center text-lg"></div>
                             <div>
                                 <h3 className="text-white font-bold">Transaction Verification</h3>
                                 <p className="text-xs text-sentinel-400">Algorand Blockchain Record</p>
@@ -191,7 +191,7 @@ export default function Verify() {
                 <div className="bg-sentinel-800 border border-sentinel-700 rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-accent/10 to-algo-teal/10 p-5 border-b border-sentinel-700">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center text-lg">🛡️</div>
+                            <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center text-lg"></div>
                             <div>
                                 <h3 className="text-white font-bold">Risk Alert Certificate</h3>
                                 <p className="text-xs text-sentinel-400">Algorand Verified • Immutable Record</p>
@@ -219,7 +219,7 @@ export default function Verify() {
                             <div key={label} className="flex justify-between py-2 border-b border-sentinel-700/50">
                                 <span className="text-sm text-sentinel-400">{label}</span>
                                 <span className={`text-sm font-mono ${label === 'Blockchain Tx' ? 'text-algo-teal' :
-                                        label?.toString().includes('Hash') ? 'text-accent text-xs' : 'text-white'
+                                    label?.toString().includes('Hash') ? 'text-accent text-xs' : 'text-white'
                                     }`}>
                                     {value}
                                 </span>
@@ -245,7 +245,7 @@ export default function Verify() {
                             }}
                             className="w-full block text-center bg-sentinel-700 text-sentinel-400 py-2.5 rounded-lg text-sm font-medium hover:text-white transition"
                         >
-                            ⛓️ Cross-verify Transaction Hash
+                            Cross-verify Transaction Hash
                         </button>
                     </div>
                 </div>

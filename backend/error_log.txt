@@ -1,0 +1,14 @@
+D:\nexathon\backend\node_modules\mongoose\lib\mongoose.js:609
+      throw new _mongoose.Error.OverwriteModelError(name);
+            ^
+OverwriteModelError: Cannot overwrite `Alert` model once compiled.
+    at Mongoose.model (D:\nexathon\backend\node_modules\mongoose\lib\mongoose.js:609:13)
+    at Object.<anonymous> (D:\nexathon\backend\src\models\Alert.ts:16:25)
+    at Module._compile (node:internal/modules/cjs/loader:1554:14)
+    at Module.m._compile (D:\nexathon\backend\node_modules\ts-node\src\index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1706:10
+    at Object.require.extensions.<computed> [as .ts] (D:\nexathon\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1289:32)
+    at Function._load (node:internal/modules/cjs/loader:1108:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)

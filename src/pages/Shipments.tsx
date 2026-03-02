@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getShipments, createShipment, analyzeShipment } from '../services/api';
 import type { Shipment } from '../types';
+import { playAlertSound } from '../utils/audio';
 
 interface ShipmentsProps {
     role: string;
@@ -48,14 +49,20 @@ export default function Shipments({ role }: ShipmentsProps) {
     });
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const fetchShipments = useCallback(async () => {
+        console.log("fetchShipments starting...");
         try {
+            console.log("Calling getShipments API...");
             const data = await getShipments();
+            console.log("getShipments returned data:", data);
             setShipments(data);
-        } catch {
+        } catch (error) {
+            console.error("fetchShipments error:", error);
             setShipments([]);
         } finally {
+            console.log("Setting loading to false");
             setLoading(false);
         }
     }, []);
@@ -94,10 +101,10 @@ export default function Shipments({ role }: ShipmentsProps) {
             setShipments(prev => [created, ...prev]);
             setShowForm(false);
             setForm({ origin: '', destination: '', distance: '', expectedDeliveryDays: '', actualDeliveryDays: '', carrier: '', weight: '', temperature: '', trafficLevel: 'Medium' });
-            setNotification(`✅ Shipment ${created.shipmentID} created successfully!`);
+            setNotification(`Shipment ${created.shipmentID} created successfully!`);
             setTimeout(() => setNotification(null), 4000);
         } catch (err) {
-            setNotification('❌ Failed to create shipment. Is the backend running?');
+            setNotification('Failed to create shipment. Is the backend running?');
             setTimeout(() => setNotification(null), 4000);
         }
     };
@@ -106,11 +113,16 @@ export default function Shipments({ role }: ShipmentsProps) {
         setAnalyzing(shipmentID);
         try {
             const result = await analyzeShipment(shipmentID);
-            setNotification(`🤖 ${shipmentID}: Risk Score ${result.riskScore} (${result.riskType}) ${result.blockchainTx ? '— logged on Algorand' : ''}`);
+            playAlertSound();
+            setNotification(`${shipmentID}: Risk Score ${result.riskScore} (${result.riskType})`);
             await fetchShipments(); // refresh to get updated status
-            setTimeout(() => setNotification(null), 6000);
+            setTimeout(() => {
+                setNotification(null);
+                navigate('/alerts');
+            }, 2500);
         } catch {
-            setNotification(`❌ Analysis failed for ${shipmentID}`);
+            playAlertSound();
+            setNotification(`Analysis failed for ${shipmentID}`);
             setTimeout(() => setNotification(null), 4000);
         } finally {
             setAnalyzing(null);
@@ -204,7 +216,7 @@ export default function Shipments({ role }: ShipmentsProps) {
                                             <span className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
                                             Analyzing...
                                         </span>
-                                    ) : '🤖 Analyze Risk'}
+                                    ) : 'Analyze Risk'}
                                 </button>
                             )}
                         </div>
@@ -216,7 +228,7 @@ export default function Shipments({ role }: ShipmentsProps) {
             {showForm && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-sentinel-800 border border-sentinel-700 rounded-2xl p-6 w-full max-w-lg">
-                        <h3 className="text-lg font-bold text-white mb-4">📦 Create New Shipment</h3>
+                        <h3 className="text-lg font-bold text-white mb-4">Create New Shipment</h3>
                         <div className="grid grid-cols-2 gap-3">
                             {/* Origin */}
                             <div>

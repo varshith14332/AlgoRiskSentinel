@@ -73,8 +73,8 @@ export default function Dashboard({ role }: DashboardProps) {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard title="Total Shipments" value={stats.totalShipments} icon="📦" color="accent" trend="+12% this week" />
-                <StatCard title="Delayed Shipments" value={stats.delayedShipments} icon="⏱️" color="yellow" trend={`${((stats.delayedShipments / Math.max(stats.totalShipments, 1)) * 100).toFixed(0)}% of total`} />
+                <StatCard title="Total Shipments" value={stats.totalShipments} icon="" color="accent" trend="+12% this week" />
+                <StatCard title="Delayed Shipments" value={stats.delayedShipments} icon="" color="yellow" trend={`${((stats.delayedShipments / Math.max(stats.totalShipments, 1)) * 100).toFixed(0)}% of total`} />
                 <StatCard title="High Risk" value={stats.highRiskShipments} icon="🚨" color="red" trend="Requires attention" />
                 <StatCard title="Avg Risk Score" value={stats.averageRiskScore.toFixed(1)} icon="📊" color="green" trend="Target: < 40" />
             </div>
@@ -103,7 +103,7 @@ export default function Dashboard({ role }: DashboardProps) {
             {/* Algorand Integration Status */}
             <div className="bg-gradient-to-r from-algo-teal/10 to-accent/10 border border-algo-teal/20 rounded-xl p-5">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center">⛓️</div>
+                    <div className="w-10 h-10 bg-algo-teal/20 rounded-lg flex items-center justify-center"></div>
                     <div>
                         <h3 className="text-sm font-medium text-white">Algorand Blockchain Integration</h3>
                         <p className="text-xs text-sentinel-400 mt-0.5">

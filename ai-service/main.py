@@ -12,6 +12,7 @@ from models.delay_predictor import predict_delay
 from models.anomaly_detector import detect_anomaly
 from models.fraud_detector import detect_fraud
 from models.route_analyzer import analyze_route_deviation
+from models.catboost_predictor import predict_catboost_risk
 
 app = FastAPI(
     title="AlgoRisk Sentinel AI Service",
@@ -90,6 +91,10 @@ def analyze_shipment(data: ShipmentData):
     if data.routeCoordinates and data.actualRouteCoordinates:
         route_result = analyze_route_deviation(data)
         results.append(route_result)
+
+    # 5. ML Model (CatBoost)
+    catboost_result = predict_catboost_risk(data)
+    results.append(catboost_result)
 
     # Return highest risk score result
     best = max(results, key=lambda r: r["riskScore"])

@@ -29,7 +29,7 @@ export const getAlert = (shipmentID: string, key?: string) => {
 export const getDashboardStats = () => api.get<DashboardStats>('/analytics/dashboard').then(r => r.data);
 
 // ── AI / Risk Analysis ──
-export const analyzeShipment = (shipmentID: string) => api.post<RiskAnalysis & { blockchainTx?: string }>(`/shipments/${shipmentID}/analyze`).then(r => r.data);
+export const analyzeShipment = (shipmentID: string) => api.post<{ analysis: RiskAnalysis, alert: Alert }>(`/shipments/${shipmentID}/analyze`).then(r => r.data.analysis);
 
 // ── Blockchain verification ──
 export const verifyCertificate = (shipmentID: string) => api.get<AlertCertificate>(`/verify/${shipmentID}`).then(r => r.data);

@@ -23,7 +23,7 @@ export default function AlertsTable({ alerts, onVerify, onPayForAccess }: Alerts
     if (alerts.length === 0) {
         return (
             <div className="text-center py-12 text-sentinel-400">
-                <p className="text-4xl mb-3">🛡️</p>
+                <p className="text-4xl mb-3"></p>
                 <p className="text-sm">No risk alerts detected</p>
             </div>
         );
