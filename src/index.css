@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+
+@theme {
+  --color-sentinel-900: #0a0e1a;
+  --color-sentinel-800: #111827;
+  --color-sentinel-700: #1e2a3a;
+  --color-sentinel-600: #2d3b4e;
+  --color-sentinel-500: #4a5e78;
+  --color-sentinel-400: #7b8fa8;
+  --color-accent: #00d4ff;
+  --color-accent-dim: #0099cc;
+  --color-risk-low: #22c55e;
+  --color-risk-medium: #f59e0b;
+  --color-risk-high: #ef4444;
+  --color-algo-teal: #00c2a8;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-sentinel-900 text-white font-sans antialiased;
+    margin: 0;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-sentinel-800);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-sentinel-600);
+    border-radius: 3px;
+  }
+}
