@@ -6,6 +6,7 @@ import Analytics from './pages/Analytics';
 import MapView from './pages/MapView';
 import Shipments from './pages/Shipments';
 import Verify from './pages/Verify';
+import SecretAccess from './pages/SecretAccess';
 import { connectWallet, disconnectWallet, reconnectSession } from './services/walletService';
 
 // Role-based navigation config
@@ -16,6 +17,7 @@ const ALL_NAV_ITEMS = [
   { path: '/analytics', label: 'Analytics', icon: '', roles: ['analyst'] },
   { path: '/map', label: 'Map', icon: '', roles: ['supplier', 'distributor', 'analyst'] },
   { path: '/verify', label: 'Verify', icon: '', roles: ['supplier', 'distributor', 'analyst', 'public'] },
+  { path: '/secret-access', label: 'Secret (402)', icon: '', roles: ['supplier', 'distributor', 'analyst', 'public'] },
 ];
 
 // Default landing per role
@@ -187,6 +189,7 @@ export default function App() {
                   : <Navigate to={ROLE_DEFAULT[role] || '/verify'} replace />
               } />
               <Route path="/verify" element={<Verify />} />
+              <Route path="/secret-access" element={<SecretAccess />} />
             </Routes>
           </main>
         </div>

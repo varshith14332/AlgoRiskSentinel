@@ -6,6 +6,7 @@ import { connectDB } from "./config/mongodb";
 import shipmentRoutes from "./routes/shipmentRoutes";
 import alertRoutes from "./routes/alertRoutes";
 import analyticsRoutes from "./routes/analyticsRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ connectDB();
 app.use("/api/shipments", shipmentRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api", paymentRoutes);
 
 app.get("/", (req, res) => {
     res.send("AlgoRisk API Running");
