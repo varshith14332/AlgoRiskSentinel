@@ -6,6 +6,7 @@ const alertSchema = new mongoose.Schema(
         riskType: String,
         riskScore: Number,
         severity: String,
+        summary: String,
         blockchainTx: String,
         alertHash: String,
         timestamp: Date,

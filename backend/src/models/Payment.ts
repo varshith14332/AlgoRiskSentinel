@@ -6,6 +6,7 @@ const paymentSchema = new mongoose.Schema(
         shipmentID: String,
         txHash: String,
         accessKey: String,
+        anomalyHash: String,
         amount: Number,
         verified: {
             type: Boolean,

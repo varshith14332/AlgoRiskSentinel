@@ -7,6 +7,7 @@ import MapView from './pages/MapView';
 import Shipments from './pages/Shipments';
 import Verify from './pages/Verify';
 import SecretAccess from './pages/SecretAccess';
+import AnimatedBackground from './components/AnimatedBackground';
 import { connectWallet, disconnectWallet, reconnectSession } from './services/walletService';
 
 // Role-based navigation config
@@ -56,9 +57,10 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex h-screen overflow-hidden relative">
+        <AnimatedBackground />
         {/* Sidebar */}
-        <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-sentinel-800 border-r border-sentinel-700 flex flex-col transition-all duration-300 shrink-0`}>
+        <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-sentinel-800/80 backdrop-blur-md border-r border-sentinel-700 flex flex-col transition-all duration-300 shrink-0 z-10 relative`}>
           <div className="p-4 border-b border-sentinel-700">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-algo-teal flex items-center justify-center text-sm font-bold">
@@ -117,9 +119,9 @@ export default function App() {
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden z-10 relative">
           {/* Top bar */}
-          <header className="h-14 bg-sentinel-800 border-b border-sentinel-700 flex items-center justify-between px-4 shrink-0">
+          <header className="h-14 bg-sentinel-800/80 backdrop-blur-md border-b border-sentinel-700 flex items-center justify-between px-4 shrink-0">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -161,7 +163,7 @@ export default function App() {
           </header>
 
           {/* Page content */}
-          <main className="flex-1 overflow-y-auto p-6 bg-sentinel-900">
+          <main className="flex-1 overflow-y-auto p-6 bg-sentinel-900/60 backdrop-blur-sm">
             <Routes>
               <Route path="/" element={
                 ['supplier', 'distributor', 'analyst'].includes(role)

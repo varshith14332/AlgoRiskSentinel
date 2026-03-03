@@ -4,8 +4,8 @@ const Alert = require('../src/models/Alert').default || require('../src/models/A
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
-function generateAlertHash(shipmentID, riskScore, timestamp) {
-    return crypto.createHash('sha256').update(`${shipmentID}${riskScore}${timestamp}`).digest('hex');
+function generateAlertHash(summary) {
+    return crypto.createHash('sha256').update(summary).digest('hex');
 }
 
 function classifySeverity(score) {
@@ -64,14 +64,20 @@ function fallbackAnalysis(shipment) {
 
 async function createAlertFromAnalysis(analysis) {
     const timestamp = new Date().toISOString();
-    const alertHash = generateAlertHash(analysis.shipmentID, analysis.riskScore, timestamp);
+
+    // Generate an explicit anomaly summary to be anchored to the blockchain
+    const severity = analysis.severity || classifySeverity(analysis.riskScore);
+    const summary = analysis.summary || `${severity} severity ${analysis.riskType} anomaly detected for Shipment ${analysis.shipmentID} at ${timestamp}. Risk Score: ${analysis.riskScore}/100.`;
+
+    const alertHash = generateAlertHash(summary);
 
     const alert = new Alert({
         shipmentID: analysis.shipmentID,
         riskScore: analysis.riskScore,
         riskType: analysis.riskType,
-        severity: analysis.severity || classifySeverity(analysis.riskScore),
+        severity: severity,
         confidence: analysis.confidence,
+        summary: summary,
         alertHash,
         isPremium: analysis.riskScore >= 70,
         timestamp,

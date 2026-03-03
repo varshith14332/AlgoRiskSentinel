@@ -2,6 +2,7 @@ import express from "express";
 import algosdk from "algosdk";
 
 import Payment from "../models/Payment";
+import Alert from "../models/Alert";
 
 const router = express.Router();
 
@@ -40,8 +41,32 @@ async function verifyPaymentOnChain(txId: string, walletAddress: string) {
                     paymentTxn.amount >= 10000;
 
                 if (valid) {
-                    console.log("✅ Payment verified on blockchain");
-                    return true;
+                    if (!tx.note) {
+                        console.log("❌ No note field found in payment transaction.");
+                        return false;
+                    }
+
+                    const noteBuffer = Buffer.from(tx.note);
+                    const noteDecoded = noteBuffer.toString('utf-8');
+
+                    let hashToSearch = noteDecoded;
+                    try {
+                        const parsed = JSON.parse(noteDecoded);
+                        if (parsed.hash) {
+                            hashToSearch = parsed.hash;
+                        }
+                    } catch (e) {
+                        // Not JSON, fallback to raw string
+                    }
+
+                    const anomaly = await Alert.findOne({ alertHash: hashToSearch });
+                    if (!anomaly) {
+                        console.log("❌ Transaction note does not match any known Anomaly Hash.");
+                        return false;
+                    }
+
+                    console.log("✅ Payment verified on blockchain and linked to Anomaly:", anomaly.shipmentID);
+                    return hashToSearch;
                 }
 
                 return false;
@@ -66,10 +91,10 @@ router.post("/verify-payment", async (req, res) => {
         return res.status(400).json({ message: "Wallet address and txId are required" });
     }
 
-    const valid = await verifyPaymentOnChain(txId, walletAddress);
+    const noteDecoded = await verifyPaymentOnChain(txId, walletAddress);
 
-    if (!valid) {
-        return res.status(400).json({ message: "Invalid payment transaction on blockchain" });
+    if (!noteDecoded) {
+        return res.status(400).json({ message: "Invalid payment transaction on blockchain or missing note" });
     }
 
     try {
@@ -79,6 +104,7 @@ router.post("/verify-payment", async (req, res) => {
             txHash: txId, // Using the existing model field 'txHash'
             amount: 100000,
             verified: true,
+            anomalyHash: noteDecoded, // Store the linked anomaly hash
             accessKey: "" // Mark as unused explicitly
         });
 
@@ -111,14 +137,24 @@ router.post("/copy-secret", async (req, res) => {
             });
         }
 
-        // Generate the true secret hash server-side strictly AFTER verification
-        const secret = crypto.randomUUID();
+        const anomaly = await Alert.findOne({ alertHash: paidRecord.anomalyHash });
+        if (!anomaly) {
+            return res.status(404).json({ message: "Linked anomaly no longer exists" });
+        }
 
-        // Consume the payment record by attaching the generated secret
-        paidRecord.accessKey = secret;
+        // Generate the consumption key server-side strictly AFTER verification
+        const secretConsumptionKey = crypto.randomUUID();
+
+        // Consume the payment record by attaching the consumption key
+        paidRecord.accessKey = secretConsumptionKey;
         await paidRecord.save();
 
-        res.json({ secret });
+        res.json({
+            secret: secretConsumptionKey,
+            shipmentId: anomaly.shipmentID,
+            anomalySummary: anomaly.summary,
+            blockchainTx: paidRecord.txHash
+        });
     } catch (e: any) {
         console.error("Database error finding payment:", e);
         return res.status(500).json({ message: "Internal server error checking payment route", error: e.message });

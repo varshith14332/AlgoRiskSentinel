@@ -23,6 +23,8 @@ export default function SecretAccess() {
     const [walletAddress, setWalletAddress] = useState<string | null>(getConnectedAddress());
     const [secret, setSecret] = useState('');
     const [txId, setTxId] = useState('');
+    const [anomalySummary, setAnomalySummary] = useState('');
+    const [shipmentId, setShipmentId] = useState('');
     const [status, setStatus] = useState<'idle' | 'generating' | 'pending_payment' | 'paid' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -40,6 +42,8 @@ export default function SecretAccess() {
     const generateSecret = () => {
         setSecret('');
         setTxId('');
+        setAnomalySummary('');
+        setShipmentId('');
         setStatus('idle');
         setErrorMessage('');
     };
@@ -111,8 +115,10 @@ export default function SecretAccess() {
             if (!data.secret) throw new Error("No secret returned");
 
             setSecret(data.secret);
+            setAnomalySummary(data.anomalySummary);
+            setShipmentId(data.shipmentId);
 
-            const combined = `Hash Key: ${data.secret}\nTransaction ID: ${txId || 'N/A'}`;
+            const combined = `Shipment ID: ${data.shipmentId}\nAnomaly: ${data.anomalySummary}\nHash Key: ${data.secret}\nTransaction ID: ${txId || 'N/A'}`;
             await copyToClipboard(combined);
 
             setStatus('paid');
@@ -128,6 +134,21 @@ export default function SecretAccess() {
         try {
             if (!walletAddress) throw new Error("Wallet not connected");
 
+            // Fetch latest anomaly hash from the database
+            const alertRes = await fetch("/api/alerts/latest");
+            if (!alertRes.ok) throw new Error("Failed to fetch latest anomaly hash");
+            const alertData = await alertRes.json();
+            const anomalyHash = alertData.alertHash;
+            if (!anomalyHash) throw new Error("No anomaly hash found");
+
+            // Encode the JSON payload into Uint8Array for the Algorand transaction note
+            const payload = JSON.stringify({
+                ship: alertData.shipmentID,
+                risk: alertData.riskScore,
+                hash: anomalyHash
+            });
+            const note = new TextEncoder().encode(payload);
+
             const algod = new algosdk.Algodv2('', "https://testnet-api.algonode.cloud", '');
             const params = await algod.getTransactionParams().do();
 
@@ -137,6 +158,7 @@ export default function SecretAccess() {
                 sender: walletAddress,
                 receiver: "2REZRAJJXTOT7JA72NNVTNDH6CWE6UOQZX4JHTWW2JU3GQ27LWFWSEIPVQ",
                 amount: 10000, // 0.01 ALGO
+                note: note, // 🔥 LINKING HASH TO BLOCKCHAIN
                 suggestedParams: params
             });
 
@@ -208,7 +230,15 @@ export default function SecretAccess() {
                 {status === 'paid' && secret && (
                     <div className="space-y-4 p-4 bg-risk-low/10 rounded-lg border border-risk-low/30">
                         <div>
-                            <p className="text-xs text-sentinel-400 mb-1">Decrypted Hash Key</p>
+                            <p className="text-xs text-sentinel-400 mb-1">Shipment ID</p>
+                            <p className="font-mono text-white text-sm">{shipmentId}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-sentinel-400 mb-1">AI Anomaly Summary</p>
+                            <p className="text-sm text-yellow-400 font-medium">{anomalySummary}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-sentinel-400 mb-1">Decrypted Hash Access Key</p>
                             <p className="font-mono text-accent text-sm break-all">{secret}</p>
                         </div>
                         <div>

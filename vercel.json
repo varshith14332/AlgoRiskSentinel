@@ -1,0 +1,39 @@
+{
+    "version": 2,
+    "buildCommand": "npm run build && cd backend && tsc",
+    "outputDirectory": "dist",
+    "installCommand": "npm install && cd backend && npm install && npm install typescript @types/node @types/express @types/mongoose @types/cors --no-save",
+    "builds": [
+        {
+            "src": "api/index.ts",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/index.ts"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
+    ],
+    "env": {
+        "VITE_API_URL": "/api"
+    }
+}
