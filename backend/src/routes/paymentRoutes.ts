@@ -78,7 +78,8 @@ router.post("/verify-payment", async (req, res) => {
             walletAddress,
             txHash: txId, // Using the existing model field 'txHash'
             amount: 100000,
-            verified: true
+            verified: true,
+            accessKey: "" // Mark as unused explicitly
         });
 
         res.json({ success: true });
@@ -89,7 +90,7 @@ router.post("/verify-payment", async (req, res) => {
 });
 
 router.post("/copy-secret", async (req, res) => {
-    const { walletAddress, txId } = req.body;
+    const { walletAddress } = req.body;
 
     if (!walletAddress) {
         return res.status(400).json({ message: "Wallet address is required" });
@@ -97,9 +98,11 @@ router.post("/copy-secret", async (req, res) => {
 
     try {
         // Check backend state instead of making stateless indexer calls
+        // We only want Payments that have NOT been consumed yet
         const paidRecord = await Payment.findOne({
             walletAddress,
-            verified: true
+            verified: true,
+            $or: [{ accessKey: "" }, { accessKey: { $exists: false } }]
         });
 
         if (!paidRecord) {
@@ -108,9 +111,14 @@ router.post("/copy-secret", async (req, res) => {
             });
         }
 
-        res.json({
-            secret: txId
-        });
+        // Generate the true secret hash server-side strictly AFTER verification
+        const secret = crypto.randomUUID();
+
+        // Consume the payment record by attaching the generated secret
+        paidRecord.accessKey = secret;
+        await paidRecord.save();
+
+        res.json({ secret });
     } catch (e: any) {
         console.error("Database error finding payment:", e);
         return res.status(500).json({ message: "Internal server error checking payment route", error: e.message });

@@ -38,10 +38,8 @@ export default function SecretAccess() {
     }, []);
 
     const generateSecret = () => {
-        const random = crypto.randomUUID();
-        const randomTx = 'TX_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-        setSecret(random);
-        setTxId(randomTx);
+        setSecret('');
+        setTxId('');
         setStatus('idle');
         setErrorMessage('');
     };
@@ -79,6 +77,9 @@ export default function SecretAccess() {
                 setStatus('generating'); // Reusing status for 'verifying' purely for the button loader UI
                 setErrorMessage('Verifying payment on Algorand...');
 
+                // WAIT for confirmation before sending the explicit validation step
+                await new Promise(r => setTimeout(r, 4000));
+
                 // 2) Send txId to backend for verification
                 const verifyRes = await fetch("/api/verify-payment", {
                     method: "POST",
@@ -92,28 +93,30 @@ export default function SecretAccess() {
                     return;
                 }
 
-                // 3) Retry copy after verification
+                // Payment stored in DB, save txId to state
+                setTxId(paymentTxId);
+
+                // 3) Retry copy-secret after verification
                 res = await fetch("/api/copy-secret", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ walletAddress, txId: secret })
+                    body: JSON.stringify({ walletAddress })
                 });
             }
 
-            if (res.ok) {
-                const data = await res.json();
-                if (!data.secret) throw new Error("No secret returned");
+            if (!res.ok) throw new Error("Access failed");
 
-                const combined = `Hash Key: ${data.secret}\nTransaction ID: ${txId}`;
-                await copyToClipboard(combined);
+            // 4) Backend generates true secret hash securely
+            const data = await res.json();
+            if (!data.secret) throw new Error("No secret returned");
 
-                setStatus('paid');
-                setErrorMessage('');
-                // alert('Secret Copied to Clipboard!');
-            } else if (res.status !== 402) {
-                setStatus('error');
-                setErrorMessage('Error accessing secret');
-            }
+            setSecret(data.secret);
+
+            const combined = `Hash Key: ${data.secret}\nTransaction ID: ${txId || 'N/A'}`;
+            await copyToClipboard(combined);
+
+            setStatus('paid');
+            setErrorMessage('');
         } catch (err) {
             console.error(err);
             setStatus('error');
@@ -145,7 +148,6 @@ export default function SecretAccess() {
             // Pera returns Uint8Arrays. Send the first transaction buffer to the network
             const signedTxnBytes = signedTxnsData[0];
             const tx = await algod.sendRawTransaction(signedTxnBytes).do();
-            console.log("Payment TX ID:", tx.txid);
 
             return tx.txid;
         } catch (error) {
@@ -183,17 +185,13 @@ export default function SecretAccess() {
                     </div>
                 </div>
 
-                {secret && (
+                {/* Payment button area always visible after clicking generate until paid */}
+                {(status !== 'idle' || secret === '') && status !== 'paid' && (
                     <div className="space-y-4 p-4 bg-sentinel-900/50 rounded-lg border border-sentinel-700">
-                        <div>
-                            <p className="text-xs text-sentinel-400 mb-1">Hash Key</p>
-                            <p className="font-mono text-accent text-sm break-all">{secret}</p>
+                        <div className="flex flex-col items-center py-4 space-y-2 text-sentinel-400">
+                            <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            <p className="text-sm">Secret Payload is Encrypted</p>
                         </div>
-                        <div>
-                            <p className="text-xs text-sentinel-400 mb-1">Transaction ID</p>
-                            <p className="font-mono text-algo-teal text-sm">{txId}</p>
-                        </div>
-
                         <button
                             onClick={() => handleCopy()}
                             disabled={status === 'generating' || status === 'pending_payment'}
@@ -201,8 +199,26 @@ export default function SecretAccess() {
                         >
                             {status === 'generating' ? 'Verifying access...' :
                                 status === 'pending_payment' ? 'Awaiting Payment...' :
-                                    'Copy Secret'}
+                                    'Purchase Secret (0.01 ALGO)'}
                         </button>
+                    </div>
+                )}
+
+                {/* Securely Revealed Data Only After Payment */}
+                {status === 'paid' && secret && (
+                    <div className="space-y-4 p-4 bg-risk-low/10 rounded-lg border border-risk-low/30">
+                        <div>
+                            <p className="text-xs text-sentinel-400 mb-1">Decrypted Hash Key</p>
+                            <p className="font-mono text-accent text-sm break-all">{secret}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-sentinel-400 mb-1">Blockchain Receipt (TXID)</p>
+                            <p className="font-mono text-algo-teal text-sm">{txId}</p>
+                        </div>
+
+                        <div className="text-xs text-risk-low text-center font-semibold pt-2 border-t border-risk-low/20">
+                            Payload Copied to Clipboard! ✓
+                        </div>
                     </div>
                 )}
             </div>
