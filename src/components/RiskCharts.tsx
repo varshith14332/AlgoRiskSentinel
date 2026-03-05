@@ -46,7 +46,7 @@ export function AlertTypesChart({ data }: { data: { name: string; value: number 
         <ChartCard title="Alerts by Type">
             <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
-                    <Pie data={data} innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                    <Pie data={data} innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}>
                         {data.map((_, i) => (
                             <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
